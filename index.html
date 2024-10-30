@@ -29,24 +29,40 @@
             text-align: center;
             text-decoration: none;
             outline: none;
-            color: #fff; /* 白色文字 */
-            background-color: #00b62e; /* 浅绿色背景 */
+            color: #fff; 
+            background-color: #00b62e; 
             border: none;
             border-radius: 5px;
         }
 
-        .button:hover {background-color: #509708} /* 鼠标悬停时的背景色 */
+        .button:hover {background-color: #509708} 
 
         .button:active {
-            background-color: #417a08; /* 按下时的背景色 */
-            /* box-shadow: 0 5px #666; 移除阴影 */
+            background-color: #417a08; 
             transform: translateY(4px);
+        }
+        #days-count {
+            white-space: nowrap; 
         }
     </style>
 </head>
 <body>
     <h1 style="font-size:34px;">一个简陋的“网盘”</h1>
     <h1 style="font-size:13px;">使用此工具代表您同意<a href="https://pan.fsyfsy.us.kg/notice/">免责声明</a></h1>
+    <h1 style="font-size:16px;">本网站已经稳定运行<span id="days-count"></span>天, 累计存储6个文件</h1>
+
+    <script>
+        function calculateDays() {
+            const targetDate = new Date('2024-10-21');
+            const currentDate = new Date();
+            const timeDifference = currentDate - targetDate;
+            const daysDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+            return daysDifference;
+        }
+
+        document.getElementById('days-count').innerText = calculateDays();
+    </script>
+
     <h2 style="font-size:20;">DiskGenius.exe - 20.4MB</h2>
     <p>
         <a href="https://cf.ghproxy.cc/https://github.com/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe" class="button">下载链接1</a>  

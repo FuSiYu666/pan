@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Days Until October 21, 2024</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #days-container {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="days-container">
+        <h1>Days Until October 21, 2024</h1>
+        <p id="days-count"></p>
+    </div>
+
+    <script>
+        function calculateDays() {
+            const targetDate = new Date('2024-10-21');
+            const currentDate = new Date();
+            const timeDifference = targetDate - currentDate;
+            const daysDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+            return daysDifference;
+        }
+
+        document.getElementById('days-count').innerText = calculateDays() + ' days';
+    </script>
+</body>
+</html>
