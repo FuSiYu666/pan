@@ -44,23 +44,47 @@
         #days-count {
             white-space: nowrap; 
         }
+        #time-container {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <h1 style="font-size:34px;">一个简陋的“网盘”</h1>
+    <h1 style="font-size:18px;">本网站已经稳定运行 
+        <span id="years"></span>
+        <span id="months"></span>
+        <span id="days"></span>
+        <span id="hours"></span>
+        <span id="minutes"></span>
+        <span id="seconds"></span>, 累计存储6个文件
+    </h1>
     <h1 style="font-size:13px;">使用此工具代表您同意<a href="https://pan.fsyfsy.us.kg/notice/">免责声明</a></h1>
-    <h1 style="font-size:16px;">本网站已经稳定运行<span id="days-count"></span>天, 累计存储6个文件</h1>
+
 
     <script>
-        function calculateDays() {
-            const targetDate = new Date('2024-10-21');
+        function calculateTimeDifference() {
+            const targetDate = new Date('2024-10-21T00:00:00');
             const currentDate = new Date();
             const timeDifference = currentDate - targetDate;
-            const daysDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
-            return daysDifference;
+
+            const years = Math.floor(timeDifference / (365 * 24 * 60 * 60 * 1000));
+            const months = Math.floor((timeDifference % (365 * 24 * 60 * 60 * 1000)) / (30 * 24 * 60 * 60 * 1000));
+            const days = Math.floor((timeDifference % (30 * 24 * 60 * 60 * 1000)) / (24 * 60 * 60 * 1000));
+            const hours = Math.floor((timeDifference % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+            const minutes = Math.floor((timeDifference % (60 * 60 * 1000)) / (60 * 1000));
+            const seconds = Math.floor((timeDifference % (60 * 1000)) / 1000);
+
+            document.getElementById('years').innerText = `${years} 年`;
+            document.getElementById('months').innerText = `${months} 个月`;
+            document.getElementById('days').innerText = `${days} 天`;
+            document.getElementById('hours').innerText = `${hours} 小时`;
+            document.getElementById('minutes').innerText = `${minutes} 分钟`;
+            document.getElementById('seconds').innerText = `${seconds} 秒`;
         }
 
-        document.getElementById('days-count').innerText = calculateDays();
+        calculateTimeDifference();
+        setInterval(calculateTimeDifference, 1000); // 每秒更新一次
     </script>
 
     <h2 style="font-size:20;">DiskGenius.exe - 20.4MB</h2>
