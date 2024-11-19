@@ -54,7 +54,6 @@
     <h1 style="font-size:18px;">本网站已经稳定运行 
         <span id="years"></span>
         <span id="months"></span>
-        <span id="xingqi"></span>
         <span id="days"></span>
         <span id="hours"></span>
         <span id="minutes"></span>
@@ -71,7 +70,6 @@
 
             const years = Math.floor(timeDifference / (365 * 24 * 60 * 60 * 1000));
             const months = Math.floor((timeDifference % (365 * 24 * 60 * 60 * 1000)) / (30 * 24 * 60 * 60 * 1000));
-            const xingqi = Math.floor((timeDifference % (30 * 24 * 60 * 60 * 1000)) / (7 * 24 * 60 * 60 * 1000));
             const days = Math.floor((timeDifference % (30 * 24 * 60 * 60 * 1000)) / (24 * 60 * 60 * 1000));
             const hours = Math.floor((timeDifference % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
             const minutes = Math.floor((timeDifference % (60 * 60 * 1000)) / (60 * 1000));
@@ -79,7 +77,6 @@
 
             document.getElementById('years').innerText = `${years} 年`;
             document.getElementById('months').innerText = `${months} 个月`;
-            document.getElementById('xingqi').innerText = `${xingqi} 星期`;
             document.getElementById('days').innerText = `${days} 天`;
             document.getElementById('hours').innerText = `${hours} 小时`;
             document.getElementById('minutes').innerText = `${minutes} 分钟`;
