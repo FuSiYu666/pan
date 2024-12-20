@@ -1,3 +1,44 @@
+<SCRIPT language=JavaScript> 
+    function password() { 
+        var testV = 1; 
+        var pass1 = prompt('此网盘已被加密！请输入密码:',''); 
+        
+        // 新建一个字符串数组，包含所有有效的密码
+        var validPasswords = ["a6s6s4", 
+                              "s6d4a7", 
+                              "g2f3s7", 
+                              "f4h2k5",
+                              "h3n5m4", 
+                              "m4j6k7",
+                              "j5l8k9"];
+        
+        while (testV < 3) { 
+            if (!pass1) {
+                history.go(-1); 
+            }
+            
+            // 检查输入的密码是否在有效密码数组中
+            if (validPasswords.includes(pass1)) { 
+                alert('密码正确!'); 
+                break; 
+            } 
+            
+            testV += -1; 
+            var pass1 = prompt('密码错误!请重新输入:'); 
+        } 
+            
+        if (!validPasswords.includes(pass1) && testV == 3) {
+            history.go(-1); 
+        }
+            
+        return " "; 
+    } 
+     
+    document.write(password()); 
+
+     
+</SCRIPT>
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
