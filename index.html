@@ -1,246 +1,384 @@
-<SCRIPT language=JavaScript> 
-    function password() { 
-        var testV = 1; 
-        var pass1 = prompt('此网盘已被加密！请输入密码:',''); 
-        
-        var validPasswords=["a6s6s4", 
-                            "s6d4a7", 
-                            "g2f3s7", 
-                            "f4h2k5",
-                            "h3n5m4", 
-                            "m4j6k7",
-                            "j5l8k9",
-                            "l9p0k1",
-                            "p1t2k3",
-                            "FSYFSY"];
-        
-        while (testV < 3) { 
-            if (!pass1) {
-                history.go(-1); 
-            }
-            
-            if (validPasswords.includes(pass1)) { 
-                alert('密码正确!'); 
-                break; 
-            } 
-            
-            testV += -1; 
-            var pass1 = prompt('密码错误!请重新输入:'); 
-        } 
-            
-        if (!validPasswords.includes(pass1) && testV == 3) {
-            history.go(-1); 
-        }
-            
-        return " "; 
-    } 
-     
-    document.write(password()); 
-
-     
-</SCRIPT>
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FSY的“简陋”网盘 v1.5.0</title>
-    
+    <title>密码验证</title>
     <style>
-        
-        body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            justify-content: center;
-            align-items: center;
-            background-color: #1111 ;
-            background-size: cover;
-            transition: background-image 0.5s ease-in-out;
-        }
-        
-        .hidden {
+        #passwordModal {
             display: none;
-        }
-        
-        .button-download {
-            display: inline-block;
-            padding: 5px 15px;
-            font-size: 16px;
-            cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-            outline: none;
-            color: #fff; 
-            background-color: #00b62e; 
-            border: none;
-            border-radius: 5px;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgb(110, 178, 233);
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
         }
 
-        .button-download:hover {background-color: #509708} 
-
-        .button-download:active {
-            background-color: #417a08; 
-            transform: translateY(4px);
-        }
-        #days-count {
-            white-space: nowrap; 
-        }
-        #time-container {
-            text-align: center;
+        #overlay {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgb(110, 178, 233);
+            z-index: 999;
         }
     </style>
 </head>
 <body>
-    <h1 style="font-size:34px;">一个简陋的“网盘”</h1>
-    <h1 style="font-size:18px;">本网站已经稳定运行 
-        <span id="years"></span>
-        <span id="months"></span>
-        <span id="days"></span>
-        <span id="hours"></span>
-        <span id="minutes"></span>
-        <span id="seconds"></span>, 累计存储7个文件
-    </h1>
-    <h1 style="font-size:13px;">使用此工具代表您同意<a href="https://pan.fsyfsy.us.kg/notice/">免责声明</a></h1>
-    
+<div id="overlay"></div>
+<div id="passwordModal">
+    <p>此网盘已被锁定！请输入密码:</p>
+    <input type="password" id="passwordInput" class="password-text"/>
+    <button onclick="checkPassword()" class="enter">确定</button>
+    <p id="errorMessage" style="color: red;"></p>
+</div>
+<script type="text/javascript">
+    var testV = 1;
+    var validPasswords = ["a6s6s4", "s6d4a7", "g2f3s7", "f4h2k5", "h3n5m4", "m4j6k7", "j5l8k9", "l9p0k1", "p1t2k3", "FSYFSY"];
 
-    <script>
-        function calculateTimeDifference() {
-            const targetDate = new Date('2024-10-21T10:34:16');
-            const currentDate = new Date();
-            const timeDifference = currentDate - targetDate;
+    function showPasswordModal() {
+        document.getElementById('overlay').style.display = 'block';
+        document.getElementById('passwordModal').style.display = 'block';
+    }
 
-            const years = Math.floor(timeDifference / (365 * 24 * 60 * 60 * 1000));
-            const months = Math.floor((timeDifference % (365 * 24 * 60 * 60 * 1000)) / (30 * 24 * 60 * 60 * 1000));
-            const days = Math.floor((timeDifference % (30 * 24 * 60 * 60 * 1000)) / (24 * 60 * 60 * 1000));
-            const hours = Math.floor((timeDifference % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-            const minutes = Math.floor((timeDifference % (60 * 60 * 1000)) / (60 * 1000));
-            const seconds = Math.floor((timeDifference % (60 * 1000)) / 1000);
+    function hidePasswordModal() {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('passwordModal').style.display = 'none';
+    }
 
-            document.getElementById('years').innerText = `${years} 年`;
-            document.getElementById('months').innerText = `${months} 个月`;
-            document.getElementById('days').innerText = `${days} 天`;
-            document.getElementById('hours').innerText = `${hours} 小时`;
-            document.getElementById('minutes').innerText = `${minutes} 分钟`;
-            document.getElementById('seconds').innerText = `${seconds} 秒`;
+    function checkPassword() {
+        var pass1 = document.getElementById('passwordInput').value;
+        if (!pass1) {
+            history.go(-1);
+            return;
         }
 
-        calculateTimeDifference();
-        setInterval(calculateTimeDifference, 1000);
-    </script>
-    <button onclick="location.reload()">锁定网盘</button>
-    <!--
-    ["a6s6s4", 
-    "s6d4a7", 
-    "g2f3s7", 
-    "f4h2k5",
-    "h3n5m4", 
-    "m4j6k7",
-    "j5l8k9",
-    "l9p0k1",
-    "p1t2k3",
-    "FSYFSY"];
-    -->
-    <h2 style="font-size:20;">BaoWeiLuoBo.exe - 44.7MB</h2>
-    <p>
-        <a href="https://gh-proxy.ygxz.in/https://github.com/FuSiYu666/pan/releases/download/BaoWeiLuoBo/BaoWeiLuoBo.exe" class="button-download">下载链接1</a>  
-        <a href="https://kkgithub.com/https://github.com/FuSiYu666/pan/releases/download/BaoWeiLuoBo/BaoWeiLuoBo.exe"  class="button-download">下载链接2</a>
-        <a href="https://sciproxy.com/https://github.com/FuSiYu666/pan/releases/download/BaoWeiLuoBo/BaoWeiLuoBo.exe"  class="button-download">下载链接3</a>
-        <a href="https://gh.h233.eu.org/https://github.com/FuSiYu666/pan/releases/download/BaoWeiLuoBo/BaoWeiLuoBo.exe" class="button-download">下载链接4</a>
-        <a href="https://hub.whtrys.space/https://github.com/FuSiYu666/pan/releases/download/BaoWeiLuoBo/BaoWeiLuoBo.exe" class="button-download">下载链接5</a>
-        <a href="https://hub.gitmirror.com/https://github.com/FuSiYu666/pan/releases/download/BaoWeiLuoBo/BaoWeiLuoBo.exe" class="button-download">下载链接6</a>
-        <a href="https://github.com/FuSiYu666/pan/releases/download/BaoWeiLuoBo/BaoWeiLuoBo.exe" class="button-download">下载链接7</a>
-    </p>
+        if (validPasswords.includes(pass1)) {
+            alert('密码正确!');
+            hidePasswordModal();
+        } else {
+            testV++;
+            if (testV >= 3) {
+                history.go(-1);
+            } else {
+                document.getElementById('errorMessage').innerText = '密码错误!';
+                alert("密码错误！");
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+    }
 
-    <h2 style="font-size:20;">ZhanDiMoNiQi.zip - 106.78MB</h2>
-    <p>
-        <a href="https://gh-proxy.ygxz.in/https://github.com/FuSiYu666/pan/releases/download/ZhanDiMoNiQi/ZhanDiMoNiQi.zip" class="button-download">下载链接1</a>  
-        <a href="https://kkgithub.com//https://github.com/FuSiYu666/pan/releases/download/ZhanDiMoNiQi/ZhanDiMoNiQi.zip"  class="button-download">下载链接2</a>
-        <a href="https://sciproxy.com/https://github.com/FuSiYu666/pan/releases/download/ZhanDiMoNiQi/ZhanDiMoNiQi.zip"  class="button-download">下载链接3</a>
-        <a href="https://gh.h233.eu.org/https://github.com/FuSiYu666/pan/releases/download/ZhanDiMoNiQi/ZhanDiMoNiQi.zip" class="button-download">下载链接4</a>
-        <a href="https://hub.whtrys.space/https://github.com/FuSiYu666/pan/releases/download/ZhanDiMoNiQi/ZhanDiMoNiQi.zip" class="button-download">下载链接5</a>
-        <a href="https://hub.gitmirror.com/https://github.com/FuSiYu666/pan/releases/download/ZhanDiMoNiQi/ZhanDiMoNiQi.zip" class="button-download">下载链接6</a>
-        <a href="https://github.com/FuSiYu666/pan/releases/download/ZhanDiMoNiQi/ZhanDiMoNiQi.zip" class="button-download">下载链接7</a>
-    </p>
+    window.onload = showPasswordModal;
+</script>
+</body>
+</html>
 
-    <h2 style="font-size:20;">BanJiangYinYue.zip - 17.5MB</h2>
-    <p>
-        <a href="https://gh-proxy.ygxz.in/https://github.com/FuSiYu666/pan/releases/download/BanJiangYinYue/BanJiangYinYue.zip" class="button-download">下载链接1</a>  
-        <a href="https://kkgithub.com//https://github.com/FuSiYu666/pan/releases/download/BanJiangYinYue/BanJiangYinYue.zip" class="button-download">下载链接2</a>
-        <a href="https://sciproxy.com/https://github.com/FuSiYu666/pan/releases/download/BanJiangYinYue/BanJiangYinYue.zip" class="button-download">下载链接3</a>
-        <a href="https://gh.h233.eu.org/https://github.com/FuSiYu666/pan/releases/download/BanJiangYinYue/BanJiangYinYue.zip" class="button-download">下载链接4</a>
-        <a href="https://hub.whtrys.space/https://github.com/FuSiYu666/pan/releases/download/BanJiangYinYue/BanJiangYinYue.zip" class="button-download">下载链接5</a>
-        <a href="https://hub.gitmirror.com/https://github.com/FuSiYu666/pan/releases/download/BanJiangYinYue/BanJiangYinYue.zip" class="button-download">下载链接6</a>
-        <a href="https://github.com/FuSiYu666/pan/releases/download/BanJiangYinYue/BanJiangYinYue.zip" class="button-download">下载链接7</a>
-    </p>
-    <h2 style="font-size:20;">DiskGenius.exe - 20.4MB</h2>
-    <p>
-        <a href="https://gh-proxy.ygxz.in/https://github.com/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe" class="button-download">下载链接1</a>  
-        <a href="https://kkgithub.com//https://github.com/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe" class="button-download">下载链接2</a>
-        <a href="https://sciproxy.com/https://github.com/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe" class="button-download">下载链接3</a>
-        <a href="https://gh.h233.eu.org/https://github.com/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe" class="button-download">下载链接4</a>
-        <a href="https://hub.whtrys.space/https://github.com/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe" class="button-download">下载链接5</a>
-        <a href="https://hub.gitmirror.com/https://github.com/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe" class="button-download">下载链接6</a>
-        <a href="https://github.com/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe" class="button-download">下载链接7</a>
-    </p>
-    <h2 style="font-size:20;">blackmonkey-1.zip - 451MB</h2>
-    <p>
-        <a href="https://gh-proxy.ygxz.in/https://github.com/FuSiYu666/pan/releases/download/blackmonkey/blackmonkey-1.zip" class="button-download">下载链接1</a>  
-        <a href="https://kkgithub.com//https://github.com/FuSiYu666/pan/releases/download/blackmonkey/blackmonkey-1.zip" class="button-download">下载链接2</a>
-        <a href="https://sciproxy.com/https://github.com/FuSiYu666/pan/releases/download/blackmonkey/blackmonkey-1.zip" class="button-download">下载链接3</a>
-        <a href="https://gh.h233.eu.org/https://github.com/FuSiYu666/pan/releases/download/blackmonkey/blackmonkey-1.zip" class="button-download">下载链接4</a>
-        <a href="https://hub.whtrys.space/https://github.com/FuSiYu666/pan/releases/download/blackmonkey/blackmonkey-1.zip" class="button-download">下载链接5</a>
-        <a href="https://hub.gitmirror.com/https://github.com/FuSiYu666/pan/releases/download/blackmonkey/blackmonkey-1.zip" class="button-download">下载链接6</a>
-        <a href="https://github.com/FuSiYu666/pan/releases/download/blackmonkey/blackmonkey-1.zip" class="button-download">下载链接7</a>
-    </p>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FSY的“简陋”网盘</title>
 
-    <h2 style="font-size:20;">NET3.5.exe - 2.74MB</h2>
-    <p>
-        <a href="https://gh-proxy.ygxz.in/https://github.com/FuSiYu666/pan/releases/download/NET/NET3.5.exe" class="button-download">下载链接1</a>  
-        <a href="https://kkgithub.com//https://github.com/FuSiYu666/pan/releases/download/NET/NET3.5.exe" class="button-download">下载链接2</a>
-        <a href="https://sciproxy.com/https://github.com/FuSiYu666/pan/releases/download/NET/NET3.5.exe" class="button-download">下载链接3</a>
-        <a href="https://gh.h233.eu.org/https://github.com/FuSiYu666/pan/releases/download/NET/NET3.5.exe" class="button-download">下载链接4</a>
-        <a href="https://hub.whtrys.space/https://github.com/FuSiYu666/pan/releases/download/NET/NET3.5.exe" class="button-download">下载链接5</a>
-        <a href="https://hub.gitmirror.com/https://github.com/FuSiYu666/pan/releases/download/NET/NET3.5.exe" class="button-download">下载链接6</a>
-        <a href="https://github.com/FuSiYu666/pan/releases/download/NET/NET3.5.exe" class="button-download">下载链接7</a>
-    </p>
+<style>
 
-    <h2 style="font-size:20;">NET4.0.exe - 48.1MB</h2>
-    <p>
-        <a href="https://gh-proxy.ygxz.in/https://github.com/FuSiYu666/pan/releases/download/NET/NET4.0.exe" class="button-download">下载链接1</a>  
-        <a href="https://kkgithub.com//https://github.com/FuSiYu666/pan/releases/download/NET/NET4.0.exe"  class="button-download">下载链接2</a>
-        <a href="https://sciproxy.com/https://github.com/FuSiYu666/pan/releases/download/NET/NET4.0.exe"  class="button-download">下载链接3</a>
-        <a href="https://gh.h233.eu.org/https://github.com/FuSiYu666/pan/releases/download/NET/NET4.0.exe" class="button-download">下载链接4</a>
-        <a href="https://hub.whtrys.space/https://github.com/FuSiYu666/pan/releases/download/NET/NET4.0.exe" class="button-download">下载链接5</a>
-        <a href="https://hub.gitmirror.com/https://github.com/FuSiYu666/pan/releases/download/NET/NET4.0.exe" class="button-download">下载链接6</a>
-        <a href="https://github.com/FuSiYu666/pan/releases/download/NET/NET4.0.exe" class="button-download">下载链接7</a>
-    </p>
+    body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(110, 178, 233);
+        background-size: cover;
+        transition: background-image 0.5s ease-in-out;
+    }
 
-    <h2 style="font-size:20;">Shawarma.Legend.zip - 78.8MB</h2>
-    <p>
-        <a href="https://gh-proxy.ygxz.in/https://github.com/FuSiYu666/pan/releases/download/Shawarma.Legend/Shawarma.Legend.zip" class="button-download">下载链接1</a>  
-        <a href="https://kkgithub.com//https://github.com/FuSiYu666/pan/releases/download/Shawarma.Legend/Shawarma.Legend.zip"  class="button-download">下载链接2</a>
-        <a href="https://sciproxy.com/https://github.com/FuSiYu666/pan/releases/download/Shawarma.Legend/Shawarma.Legend.zip"  class="button-download">下载链接3</a>
-        <a href="https://gh.h233.eu.org/https://github.com/FuSiYu666/pan/releases/download/Shawarma.Legend/Shawarma.Legend.zip" class="button-download">下载链接4</a>
-        <a href="https://hub.whtrys.space/https://github.com/FuSiYu666/pan/releases/download/Shawarma.Legend/Shawarma.Legend.zip" class="button-download">下载链接5</a>
-        <a href="https://hub.gitmirror.com/https://github.com/FuSiYu666/pan/releases/download/Shawarma.Legend/Shawarma.Legend.zip" class="button-download">下载链接6</a>
-        <a href="https://github.com/FuSiYu666/pan/releases/download/Shawarma.Legend/Shawarma.Legend.zip" class="button-download">下载链接7</a>
-    </p>
+    .hidden {
+        display: none;
+    }
 
-    <h2 style="font-size:20;">io-auto-clicker.exe - 430KB</h2>
-    <p>
-        <a href="https://gh-proxy.ygxz.in/https://github.com/FuSiYu666/pan/releases/download/io-auto-clicker/io-auto-clicker.exe" class="button-download">下载链接1</a>  
-        <a href="https://kkgithub.com//https://github.com/FuSiYu666/pan/releases/download/io-auto-clicker/io-auto-clicker.exe"  class="button-download">下载链接2</a>
-        <a href="https://sciproxy.com/https://github.com/FuSiYu666/pan/releases/download/io-auto-clicker/io-auto-clicker.exe"  class="button-download">下载链接3</a>
-        <a href="https://gh.h233.eu.org/https://github.com/FuSiYu666/pan/releases/download/io-auto-clicker/io-auto-clicker.exe" class="button-download">下载链接4</a>
-        <a href="https://hub.whtrys.space/https://github.com/FuSiYu666/pan/releases/download/io-auto-clicker/io-auto-clicker.exe" class="button-download">下载链接5</a>
-        <a href="https://hub.gitmirror.com/https://github.com/FuSiYu666/pan/releases/download/io-auto-clicker/io-auto-clicker.exe" class="button-download">下载链接6</a>
-        <a href="https://github.com/FuSiYu666/pan/releases/download/io-auto-clicker/io-auto-clicker.exe" class="button-download">下载链接7</a>
-    </p>
-    <a href="https://github.com/FuSiYu666/"><p style="font-size:18px;">本网站作者Github首页</p></a>
-    <a href="https://github.com/FuSiYu666/pan/"><p style="font-size:18px;">上传文件请出门左转-Github(FuSiYu666/pan)</p></a>
+    .button-download {
+        display: inline-block;
+        padding: 5px 15px;
+        font-size: 16px;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        outline: none;
+        color: #fff;
+        background-color: rgba(39, 110, 224);
+        border: none;
+        border-radius: 5px;
+    }
 
-    <a href="https://wormhole.app/"><p style="font-size:18px;">也可以在这里</p></a>
+    .button-download:hover {
+        background-color: rgba(108, 137, 231)
+    }
+
+    .button-download:active {
+        background-color: rgba(108, 137, 231);
+        transform: translateY(4px);
+    }
+
+    #days-count {
+        white-space: nowrap;
+    }
+
+    #time-container {
+        text-align: center;
+    }
+
+    .lock {
+        display: inline-block;
+        padding: 5px 14px;
+        font-size: 14px;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        outline: none;
+        color: #fff;
+        background-color: rgba(39, 110, 224);
+        border: none;
+        border-radius: 5px;
+    }
+
+    .lock:hover {
+        background-color: rgba(108, 137, 231)
+    }
+
+    .enter {
+        display: inline-block;
+        padding: 4px 10px;
+        font-size: 13px;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        outline: none;
+        color: #fff;
+        background-color: rgba(39, 110, 224);
+        border: none;
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .enter:hover {
+        background-color: rgba(108, 137, 231)
+    }
+
+    .password-text {
+        padding: 4px;
+        background-color: rgba(110, 178, 233);
+        border-radius: 5px;
+        border: 2px solid rgba(39, 110, 224);
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+</style>
+</head>
+<body>
+<h1 style="font-size:34px;">一个简陋的“网盘”</h1>
+<h1 style="font-size:18px;">本网站已经稳定运行
+    <span id="years"></span>
+    <span id="months"></span>
+    <span id="days"></span>
+    <span id="hours"></span>
+    <span id="minutes"></span>
+    <span id="seconds"></span>, 累计存储7个文件
+</h1>
+<h1 style="font-size:13px;">使用此工具代表您同意<a href="https://pan.fsyfsy.us.kg/notice/">免责声明</a></h1>
+<script>
+    function calculateTimeDifference() {
+        const targetDate = new Date('2024-10-21T10:34:16');
+        const currentDate = new Date();
+        const timeDifference = currentDate - targetDate;
+
+        const years = Math.floor(timeDifference / (365 * 24 * 60 * 60 * 1000));
+        const months = Math.floor((timeDifference % (365 * 24 * 60 * 60 * 1000)) / (30 * 24 * 60 * 60 * 1000));
+        const days = Math.floor((timeDifference % (30 * 24 * 60 * 60 * 1000)) / (24 * 60 * 60 * 1000));
+        const hours = Math.floor((timeDifference % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+        const minutes = Math.floor((timeDifference % (60 * 60 * 1000)) / (60 * 1000));
+        const seconds = Math.floor((timeDifference % (60 * 1000)) / 1000);
+
+        document.getElementById('years').innerText = `${years} 年`;
+        document.getElementById('months').innerText = `${months} 个月`;
+        document.getElementById('days').innerText = `${days} 天`;
+        document.getElementById('hours').innerText = `${hours} 小时`;
+        document.getElementById('minutes').innerText = `${minutes} 分钟`;
+        document.getElementById('seconds').innerText = `${seconds} 秒`;
+    }
+
+    calculateTimeDifference();
+    setInterval(calculateTimeDifference, 1000);
+</script>
+<button onclick="location.reload()" class="lock">锁定网盘</button>
+<!--
+["a6s6s4",
+"s6d4a7",
+"g2f3s7",
+"f4h2k5",
+"h3n5m4",
+"m4j6k7",
+"j5l8k9",
+"l9p0k1",
+"p1t2k3",
+"FSYFSY"];
+-->
+<h2 style="font-size:20;">BaoWeiLuoBo.exe - 44.7MB</h2>
+<p>
+    <a href="https://gh-proxy.ygxz.in/https://github.com/FuSiYu666/pan/releases/download/BaoWeiLuoBo/BaoWeiLuoBo.exe"
+       class="button-download">下载链接1</a>
+    <a href="https://kkgithub.com/https://github.com/FuSiYu666/pan/releases/download/BaoWeiLuoBo/BaoWeiLuoBo.exe"
+       class="button-download">下载链接2</a>
+    <a href="https://sciproxy.com/https://github.com/FuSiYu666/pan/releases/download/BaoWeiLuoBo/BaoWeiLuoBo.exe"
+       class="button-download">下载链接3</a>
+    <a href="https://gh.h233.eu.org/https://github.com/FuSiYu666/pan/releases/download/BaoWeiLuoBo/BaoWeiLuoBo.exe"
+       class="button-download">下载链接4</a>
+    <a href="https://hub.whtrys.space/https://github.com/FuSiYu666/pan/releases/download/BaoWeiLuoBo/BaoWeiLuoBo.exe"
+       class="button-download">下载链接5</a>
+    <a href="https://hub.gitmirror.com/https://github.com/FuSiYu666/pan/releases/download/BaoWeiLuoBo/BaoWeiLuoBo.exe"
+       class="button-download">下载链接6</a>
+    <a href="https://github.com/FuSiYu666/pan/releases/download/BaoWeiLuoBo/BaoWeiLuoBo.exe" class="button-download">下载链接7</a>
+</p>
+
+<h2 style="font-size:20;">ZhanDiMoNiQi.zip - 106.78MB</h2>
+<p>
+    <a href="https://gh-proxy.ygxz.in/https://github.com/FuSiYu666/pan/releases/download/ZhanDiMoNiQi/ZhanDiMoNiQi.zip"
+       class="button-download">下载链接1</a>
+    <a href="https://kkgithub.com//https://github.com/FuSiYu666/pan/releases/download/ZhanDiMoNiQi/ZhanDiMoNiQi.zip"
+       class="button-download">下载链接2</a>
+    <a href="https://sciproxy.com/https://github.com/FuSiYu666/pan/releases/download/ZhanDiMoNiQi/ZhanDiMoNiQi.zip"
+       class="button-download">下载链接3</a>
+    <a href="https://gh.h233.eu.org/https://github.com/FuSiYu666/pan/releases/download/ZhanDiMoNiQi/ZhanDiMoNiQi.zip"
+       class="button-download">下载链接4</a>
+    <a href="https://hub.whtrys.space/https://github.com/FuSiYu666/pan/releases/download/ZhanDiMoNiQi/ZhanDiMoNiQi.zip"
+       class="button-download">下载链接5</a>
+    <a href="https://hub.gitmirror.com/https://github.com/FuSiYu666/pan/releases/download/ZhanDiMoNiQi/ZhanDiMoNiQi.zip"
+       class="button-download">下载链接6</a>
+    <a href="https://github.com/FuSiYu666/pan/releases/download/ZhanDiMoNiQi/ZhanDiMoNiQi.zip" class="button-download">下载链接7</a>
+</p>
+
+<h2 style="font-size:20;">BanJiangYinYue.zip - 17.5MB</h2>
+<p>
+    <a href="https://gh-proxy.ygxz.in/https://github.com/FuSiYu666/pan/releases/download/BanJiangYinYue/BanJiangYinYue.zip"
+       class="button-download">下载链接1</a>
+    <a href="https://kkgithub.com//https://github.com/FuSiYu666/pan/releases/download/BanJiangYinYue/BanJiangYinYue.zip"
+       class="button-download">下载链接2</a>
+    <a href="https://sciproxy.com/https://github.com/FuSiYu666/pan/releases/download/BanJiangYinYue/BanJiangYinYue.zip"
+       class="button-download">下载链接3</a>
+    <a href="https://gh.h233.eu.org/https://github.com/FuSiYu666/pan/releases/download/BanJiangYinYue/BanJiangYinYue.zip"
+       class="button-download">下载链接4</a>
+    <a href="https://hub.whtrys.space/https://github.com/FuSiYu666/pan/releases/download/BanJiangYinYue/BanJiangYinYue.zip"
+       class="button-download">下载链接5</a>
+    <a href="https://hub.gitmirror.com/https://github.com/FuSiYu666/pan/releases/download/BanJiangYinYue/BanJiangYinYue.zip"
+       class="button-download">下载链接6</a>
+    <a href="https://github.com/FuSiYu666/pan/releases/download/BanJiangYinYue/BanJiangYinYue.zip"
+       class="button-download">下载链接7</a>
+</p>
+<h2 style="font-size:20;">DiskGenius.exe - 20.4MB</h2>
+<p>
+    <a href="https://gh-proxy.ygxz.in/https://github.com/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe"
+       class="button-download">下载链接1</a>
+    <a href="https://kkgithub.com//https://github.com/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe"
+       class="button-download">下载链接2</a>
+    <a href="https://sciproxy.com/https://github.com/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe"
+       class="button-download">下载链接3</a>
+    <a href="https://gh.h233.eu.org/https://github.com/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe"
+       class="button-download">下载链接4</a>
+    <a href="https://hub.whtrys.space/https://github.com/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe"
+       class="button-download">下载链接5</a>
+    <a href="https://hub.gitmirror.com/https://github.com/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe"
+       class="button-download">下载链接6</a>
+    <a href="https://github.com/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe"
+       class="button-download">下载链接7</a>
+</p>
+<h2 style="font-size:20;">blackmonkey-1.zip - 451MB</h2>
+<p>
+    <a href="https://gh-proxy.ygxz.in/https://github.com/FuSiYu666/pan/releases/download/blackmonkey/blackmonkey-1.zip"
+       class="button-download">下载链接1</a>
+    <a href="https://kkgithub.com//https://github.com/FuSiYu666/pan/releases/download/blackmonkey/blackmonkey-1.zip"
+       class="button-download">下载链接2</a>
+    <a href="https://sciproxy.com/https://github.com/FuSiYu666/pan/releases/download/blackmonkey/blackmonkey-1.zip"
+       class="button-download">下载链接3</a>
+    <a href="https://gh.h233.eu.org/https://github.com/FuSiYu666/pan/releases/download/blackmonkey/blackmonkey-1.zip"
+       class="button-download">下载链接4</a>
+    <a href="https://hub.whtrys.space/https://github.com/FuSiYu666/pan/releases/download/blackmonkey/blackmonkey-1.zip"
+       class="button-download">下载链接5</a>
+    <a href="https://hub.gitmirror.com/https://github.com/FuSiYu666/pan/releases/download/blackmonkey/blackmonkey-1.zip"
+       class="button-download">下载链接6</a>
+    <a href="https://github.com/FuSiYu666/pan/releases/download/blackmonkey/blackmonkey-1.zip" class="button-download">下载链接7</a>
+</p>
+
+<h2 style="font-size:20;">NET3.5.exe - 2.74MB</h2>
+<p>
+    <a href="https://gh-proxy.ygxz.in/https://github.com/FuSiYu666/pan/releases/download/NET/NET3.5.exe"
+       class="button-download">下载链接1</a>
+    <a href="https://kkgithub.com//https://github.com/FuSiYu666/pan/releases/download/NET/NET3.5.exe"
+       class="button-download">下载链接2</a>
+    <a href="https://sciproxy.com/https://github.com/FuSiYu666/pan/releases/download/NET/NET3.5.exe"
+       class="button-download">下载链接3</a>
+    <a href="https://gh.h233.eu.org/https://github.com/FuSiYu666/pan/releases/download/NET/NET3.5.exe"
+       class="button-download">下载链接4</a>
+    <a href="https://hub.whtrys.space/https://github.com/FuSiYu666/pan/releases/download/NET/NET3.5.exe"
+       class="button-download">下载链接5</a>
+    <a href="https://hub.gitmirror.com/https://github.com/FuSiYu666/pan/releases/download/NET/NET3.5.exe"
+       class="button-download">下载链接6</a>
+    <a href="https://github.com/FuSiYu666/pan/releases/download/NET/NET3.5.exe" class="button-download">下载链接7</a>
+</p>
+
+<h2 style="font-size:20;">NET4.0.exe - 48.1MB</h2>
+<p>
+    <a href="https://gh-proxy.ygxz.in/https://github.com/FuSiYu666/pan/releases/download/NET/NET4.0.exe"
+       class="button-download">下载链接1</a>
+    <a href="https://kkgithub.com//https://github.com/FuSiYu666/pan/releases/download/NET/NET4.0.exe"
+       class="button-download">下载链接2</a>
+    <a href="https://sciproxy.com/https://github.com/FuSiYu666/pan/releases/download/NET/NET4.0.exe"
+       class="button-download">下载链接3</a>
+    <a href="https://gh.h233.eu.org/https://github.com/FuSiYu666/pan/releases/download/NET/NET4.0.exe"
+       class="button-download">下载链接4</a>
+    <a href="https://hub.whtrys.space/https://github.com/FuSiYu666/pan/releases/download/NET/NET4.0.exe"
+       class="button-download">下载链接5</a>
+    <a href="https://hub.gitmirror.com/https://github.com/FuSiYu666/pan/releases/download/NET/NET4.0.exe"
+       class="button-download">下载链接6</a>
+    <a href="https://github.com/FuSiYu666/pan/releases/download/NET/NET4.0.exe" class="button-download">下载链接7</a>
+</p>
+
+<h2 style="font-size:20;">Shawarma.Legend.zip - 78.8MB</h2>
+<p>
+    <a href="https://gh-proxy.ygxz.in/https://github.com/FuSiYu666/pan/releases/download/Shawarma.Legend/Shawarma.Legend.zip"
+       class="button-download">下载链接1</a>
+    <a href="https://kkgithub.com//https://github.com/FuSiYu666/pan/releases/download/Shawarma.Legend/Shawarma.Legend.zip"
+       class="button-download">下载链接2</a>
+    <a href="https://sciproxy.com/https://github.com/FuSiYu666/pan/releases/download/Shawarma.Legend/Shawarma.Legend.zip"
+       class="button-download">下载链接3</a>
+    <a href="https://gh.h233.eu.org/https://github.com/FuSiYu666/pan/releases/download/Shawarma.Legend/Shawarma.Legend.zip"
+       class="button-download">下载链接4</a>
+    <a href="https://hub.whtrys.space/https://github.com/FuSiYu666/pan/releases/download/Shawarma.Legend/Shawarma.Legend.zip"
+       class="button-download">下载链接5</a>
+    <a href="https://hub.gitmirror.com/https://github.com/FuSiYu666/pan/releases/download/Shawarma.Legend/Shawarma.Legend.zip"
+       class="button-download">下载链接6</a>
+    <a href="https://github.com/FuSiYu666/pan/releases/download/Shawarma.Legend/Shawarma.Legend.zip"
+       class="button-download">下载链接7</a>
+</p>
+
+<h2 style="font-size:20;">io-auto-clicker.exe - 430KB</h2>
+<p>
+    <a href="https://gh-proxy.ygxz.in/https://github.com/FuSiYu666/pan/releases/download/io-auto-clicker/io-auto-clicker.exe"
+       class="button-download">下载链接1</a>
+    <a href="https://kkgithub.com//https://github.com/FuSiYu666/pan/releases/download/io-auto-clicker/io-auto-clicker.exe"
+       class="button-download">下载链接2</a>
+    <a href="https://sciproxy.com/https://github.com/FuSiYu666/pan/releases/download/io-auto-clicker/io-auto-clicker.exe"
+       class="button-download">下载链接3</a>
+    <a href="https://gh.h233.eu.org/https://github.com/FuSiYu666/pan/releases/download/io-auto-clicker/io-auto-clicker.exe"
+       class="button-download">下载链接4</a>
+    <a href="https://hub.whtrys.space/https://github.com/FuSiYu666/pan/releases/download/io-auto-clicker/io-auto-clicker.exe"
+       class="button-download">下载链接5</a>
+    <a href="https://hub.gitmirror.com/https://github.com/FuSiYu666/pan/releases/download/io-auto-clicker/io-auto-clicker.exe"
+       class="button-download">下载链接6</a>
+    <a href="https://github.com/FuSiYu666/pan/releases/download/io-auto-clicker/io-auto-clicker.exe"
+       class="button-download">下载链接7</a>
+</p>
+<a href="https://github.com/FuSiYu666/"><p style="font-size:18px;">本网站作者Github首页</p></a>
+<a href="https://github.com/FuSiYu666/pan/"><p style="font-size:18px;">上传文件请出门左转-Github(FuSiYu666/pan)</p></a>
+
+
 </body>
 </html>
