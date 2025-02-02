@@ -207,7 +207,7 @@
             if (!getCookie("loggedIn")) {
                 showPasswordModal();
             } else {
-                // User is already logged in, no need to show password modal
+                hidePasswordModal();
             }
         }
 
@@ -216,7 +216,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <body style="padding-left: 10px;">
         <h1 style="font-size:34px;">一个简陋的“网盘”的MC专区</h1>
-        <button class="lock" onclick="logout()">退出登录</button>
+        <button onclick="logout()" class="lock">锁定网盘</button>
+        <h1 style="font-size:13px;"></h1><a href="https://wj.qq.com/s2/17590422/1e25/" class="lock">反馈</a></h1>
         <h2 style="font-size:20;">PCL2(本地启动器，推荐)</h2>
         <p>
             <a href="PCL2/"class="button-download">立即进入</a>

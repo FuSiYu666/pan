@@ -73,57 +73,80 @@
         </p>
         <p id="errorMessage" style="color: red; font-size: 13px"></p>
     </div>
-    <script type="text/javascript">
-    var testV = 1;
-    var validPasswords = ["a3b7c8",
-    "d2e4f5",
-    "g6h9j3",
-    "k5m2n4",
-    "p6q8r7",
-    "t3u5v2",
-    "w9x6y4",
-    "z5a7s3",
-    "f8g2h6",
-    "j4k9m5",
-    "FSYFSY"];
+    <script>
+        var testV = 1;
+        var validPasswords = ["a3b7c8", "d2e4f5", "g6h9j3", "k5m2n4", "p6q8r7", "t3u5v2", "w9x6y4", "z5a7s3", "f8g2h6", "j4k9m5", "FSYFSY"];
 
-    function showPasswordModal() {
-        document.getElementById('overlay').style.display = 'block';
-        document.getElementById('passwordModal').style.display = 'block';
-    }
-
-    function hidePasswordModal() {
-        document.getElementById('overlay').style.display = 'none';
-        document.getElementById('passwordModal').style.display = 'none';
-    }
-
-    function checkPassword() {
-        var pass1 = document.getElementById('passwordInput').value;
-        if (!pass1) {
-            history.go(-1);
-            return;
+        function showPasswordModal() {
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('passwordModal').style.display = 'block';
         }
 
-        if (validPasswords.includes(pass1)) {
-            alert('密码正确!');
-            hidePasswordModal();
-        } else {
-            testV++;
-            if (testV >= 3) {
+        function hidePasswordModal() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('passwordModal').style.display = 'none';
+        }
+
+        function checkPassword() {
+            var pass1 = document.getElementById('passwordInput').value;
+            if (!pass1) {
                 history.go(-1);
+                return;
+            }
+
+            if (validPasswords.includes(pass1)) {
+                alert('密码正确!');
+                setCookie("loggedIn", "true", 1 / 24); // Set cookie for 1 hour
+                hidePasswordModal();
             } else {
-                document.getElementById('errorMessage').innerText = '密码错误!';
-                alert("密码错误！");
-                document.getElementById('passwordInput').value = '';
+                testV++;
+                if (testV >= 3) {
+                    history.go(-1);
+                } else {
+                    document.getElementById('errorMessage').innerText = '密码错误!';
+                    alert('密码错误！');
+                    document.getElementById('passwordInput').value = '';
+                }
             }
         }
-    }
-    function lockPand() {
-        showPasswordModal();
-    }
 
-    window.onload = showPasswordModal;
-</script>
+        function setCookie(name, value, hours) {
+            var d = new Date();
+            d.setTime(d.getTime() + (hours * 60 * 60 * 1000));
+            var expires = "expires=" + d.toUTCString();
+            document.cookie = name + "=" + value + ";" + expires + ";path=/";
+        }
+
+        function getCookie(name) {
+            var nameEQ = name + "=";
+            var ca = document.cookie.split(';');
+            for(var i=0;i < ca.length;i++) {
+                var c = ca[i];
+                while (c.charAt(0)==' ') c = c.substring(1,c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+            }
+            return null;
+        }
+
+        function deleteCookie(name) {
+            document.cookie = name + '=; Max-Age=-99999999;';
+        }
+
+        function logout() {
+            deleteCookie("loggedIn");
+            showPasswordModal(); // 显示登录页面
+        }
+
+        function lockPand() {
+            if (!getCookie("loggedIn")) {
+                showPasswordModal();
+            } else {
+                hidePasswordModal();
+            }
+        }
+
+        window.onload = lockPand; // Call lockPand when the page loads
+    </script>
 </body>
 </html>
 
@@ -270,7 +293,7 @@
         calculateTimeDifference();
         setInterval(calculateTimeDifference, 1000);
     </script>
-    <button onclick="lockPand()" class="lock">锁定网盘</button>
+    <button onclick="logout()" class="lock">锁定网盘</button>
     <h1 style="font-size:13px;"></h1><a href="https://wj.qq.com/s2/17590422/1e25/" class="lock">反馈</a></h1>
     <!--
     ["a3b7c8",
