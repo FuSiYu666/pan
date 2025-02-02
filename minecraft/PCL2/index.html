@@ -202,7 +202,8 @@
             }
         }
         function logOut() {
-            document.cookie = 'loggedIn=; Max-Age=-99999999;';
+            name = "loggedIn";
+            document.cookie = name + '=; Max-Age=-99999999;';
             showPasswordModal();
         }
         window.onload = lockPand; // Call lockPand when the page loads
