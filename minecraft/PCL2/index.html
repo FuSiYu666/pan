@@ -194,25 +194,30 @@
             return null;
         }
 
+        function deleteCookie(name) {
+            document.cookie = name + '=; Max-Age=-99999999;';
+        }
+
+        function logout() {
+            deleteCookie("loggedIn");
+            showPasswordModal(); // 显示登录页面
+        }
+
         function lockPand() {
             if (!getCookie("loggedIn")) {
                 showPasswordModal();
             } else {
-                hidePasswordModal();
+                // User is already logged in, no need to show password modal
             }
         }
-        function logOut() {
-            name = "loggedIn";
-            document.cookie = name + '=; Max-Age=-99999999;';
-            showPasswordModal();
-        }
+
         window.onload = lockPand; // Call lockPand when the page loads
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <body style="padding-left: 10px;">
-        <h1 style="font-size:34px;">一个简陋的“网盘”</h1>
-        <button onclick="logOut();" class="lock">锁定网盘</button>
-        <h2 style="font-size:20;">PCL2+1.17.1 - </h2>
+        <h1 style="font-size:34px;">一个简陋的“网盘”的MC专区</h1>
+        <button class="lock" onclick="logout()">退出登录</button>
+        <h2 style="font-size:20;">PCL2(本地启动器，推荐)</h2>
         <p>
             <a href="PCL2/"class="button-download">立即进入</a>
         </p>
