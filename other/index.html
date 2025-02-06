@@ -1,0 +1,90 @@
+<!--
+ * @Author: FuSiYu666 fusiyu666@outlook.com
+ * @Date: 2025-02-06 10:51:20
+ * @LastEditors: FuSiYu666 fusiyu666@outlook.com
+ * @LastEditTime: 2025-02-06 11:00:02
+ * @FilePath: \Firework_Simulator\other\index.html
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>开学倒计时</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(110, 178, 233);
+            background-size: cover;
+            transition: background-image 0.5s ease-in-out;
+            display: flex;
+            
+        }
+        .time-container {
+            text-align: center;
+            font-size: 20px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="time-container">
+        <div id="current-time">当前时间:</div>
+        <div id="countdown1">距离返校还有:</div>
+        <div id="countdown2">距离开学还有:</div>
+    </div>
+
+    <script>
+        function updateTimes() {
+            const now = new Date();
+            const targetTime1 = new Date('2025-02-07T08:00:00');
+            const targetTime2 = new Date('2025-02-10T08:00:00');
+
+            const currentTimeElement = document.getElementById('current-time');
+            const countdown1Element = document.getElementById('countdown1');
+            const countdown2Element = document.getElementById('countdown2');
+
+            // 更新当前时间
+            currentTimeElement.textContent = `当前时间:${now.toLocaleString()}`;
+
+            // 计算倒计时
+            const timeDiff1 = targetTime1 - now;
+            const timeDiff2 = targetTime2 - now;
+
+            const days1 = Math.floor(timeDiff1 / (1000 * 60 * 60 * 24));
+            const hours1 = Math.floor((timeDiff1 % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes1 = Math.floor((timeDiff1 % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds1 = Math.floor((timeDiff1 % (1000 * 60)) / 1000);
+
+            const days2 = Math.floor(timeDiff2 / (1000 * 60 * 60 * 24));
+            const hours2 = Math.floor((timeDiff2 % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes2 = Math.floor((timeDiff2 % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds2 = Math.floor((timeDiff2 % (1000 * 60)) / 1000);
+
+            // 更新倒计时显示
+            if (timeDiff1 > 0) {
+                countdown1Element.textContent = `距离返校还有:${days1}天 ${hours1}小时 ${minutes1}分 ${seconds1}秒`;
+            } else {
+                countdown1Element.textContent = '已经返校!';
+            }
+
+            if (timeDiff2 > 0) {
+                countdown2Element.textContent = `距离开学还有:${days2}天 ${hours2}小时 ${minutes2}分 ${seconds2}秒`;
+            } else {
+                countdown2Element.textContent = '已经开学!';
+            }
+        }
+
+        // 每秒更新时间
+        setInterval(updateTimes, 1000);
+
+        // 初始化时间显示
+        updateTimes();
+    </script>
+</body>
+</html>
