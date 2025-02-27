@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>FSY的“简陋”网盘</title>
+    <style>
+        #passwordModal {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgb(110, 178, 233);
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            border-radius: 5px;
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgb(110, 178, 233);
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <div id="overlay"></div>
+    <div id="passwordModal">
+        <p>此网盘已被锁定！请输入密码:</p>
+        <input type="password" id="passwordInput" class="password-text"/>
+        <button onclick="checkPassword()" class="enter">确定</button>
+        
+        <p style="font-size: 13px">
+            <span>没有密码？来</span>
+            <a href="getpassword/" style="font-size: 13px">密码领取器</a>
+            <span>或者</span>
+            <a href="announce/" style="font-size: 13px">公告栏</a>
+            <span>看看</span>
+        </p>
+        <p id="errorMessage" style="color: red; font-size: 13px"></p>
+    </div>
+    <script>
+        var testV = 1;
+        var validPasswords = ["a3b7c8", "d2e4f5", "g6h9j3", "k5m2n4", "p6q8r7", "t3u5v2", "w9x6y4", "z5a7s3", "f8g2h6", "j4k9m5", "FSYFSY"];
+
+        function showPasswordModal() {
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('passwordModal').style.display = 'block';
+        }
+
+        function hidePasswordModal() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('passwordModal').style.display = 'none';
+        }
+
+        function checkPassword() {
+            var pass1 = document.getElementById('passwordInput').value;
+            if (!pass1) {
+                history.go(-1);
+                return;
+            }
+
+            if (validPasswords.includes(pass1)) {
+                alert('密码正确!');
+                setCookie("loggedIn", "true", 1 / 24); // Set cookie for 1 hour
+                hidePasswordModal();
+            } else {
+                testV++;
+                if (testV >= 3) {
+                    history.go(-1);
+                } else {
+                    document.getElementById('errorMessage').innerText = '密码错误!';
+                    alert('密码错误！');
+                    document.getElementById('passwordInput').value = '';
+                }
+            }
+        }
+
+        function setCookie(name, value, hours) {
+            var d = new Date();
+            d.setTime(d.getTime() + (hours * 60 * 60 * 1000));
+            var expires = "expires=" + d.toUTCString();
+            document.cookie = name + "=" + value + ";" + expires + ";path=/";
+        }
+
+        function getCookie(name) {
+            var nameEQ = name + "=";
+            var ca = document.cookie.split(';');
+            for(var i=0;i < ca.length;i++) {
+                var c = ca[i];
+                while (c.charAt(0)==' ') c = c.substring(1,c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+            }
+            return null;
+        }
+
+        function deleteCookie(name) {
+            document.cookie = name + '=; Max-Age=-99999999;';
+        }
+
+        function logout() {
+            deleteCookie("loggedIn");
+            showPasswordModal(); // 显示登录页面
+        }
+
+        function lockPand() {
+            if (!getCookie("loggedIn")) {
+                showPasswordModal();
+            } else {
+                hidePasswordModal();
+            }
+        }
+
+        window.onload = lockPand; // Call lockPand when the page loads
+    </script>
+</body>
+</html>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FSY的“简陋”网盘</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(110, 178, 233);
+            background-size: cover;
+            transition: background-image 0.5s ease-in-out;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .button-download {
+            display: inline-block;
+            padding: 5px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            outline: none;
+            color: #fff;
+            background-color: rgba(39, 110, 224);
+            border: none;
+            border-radius: 5px;
+        }
+
+        .button-download:hover {
+            background-color: rgba(108, 137, 231)
+        }
+
+        .button-download:active {
+            background-color: rgba(108, 137, 231);
+            transform: translateY(4px);
+        }
+
+        #days-count {
+            white-space: nowrap;
+        }
+
+        #time-container {
+            text-align: center;
+        }
+
+        .lock {
+            display: inline-block;
+            padding: 5px 14px;
+            font-size: 14px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            outline: none;
+            color: #fff;
+            background-color: rgba(39, 110, 224);
+            border: none;
+            border-radius: 5px;
+        }
+
+        .lock:hover {
+            background-color: rgba(108, 137, 231)
+        }
+
+        .enter {
+            display: inline-block;
+            padding: 4px 10px;
+            font-size: 13px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            outline: none;
+            color: #fff;
+            background-color: rgba(39, 110, 224);
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .enter:hover {
+            background-color: rgba(108, 137, 231)
+        }
+
+        .password-text {
+            padding: 4px;
+            background-color: rgba(110, 178, 233);
+            border-radius: 5px;
+            border: 2px solid rgba(39, 110, 224);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body style="padding-left: 10px;">
+    <h1 style="font-size:34px;">一个简陋的“网盘”</h1>
+    <h1 style="font-size:18px;">本网站已经稳定运行
+        <span id="years"></span>
+        <span id="months"></span>
+        <span id="days"></span>
+        <span id="hours"></span>
+        <span id="minutes"></span>
+        <span id="seconds"></span>, 累计存储7个文件
+    </h1>
+    <h1 style="font-size:13px;">使用此工具代表您同意<a href="notice/">免责声明</a></h1>
+    <h1 style="font-size:13px;"></h1><a href="announce/" class="lock">公告栏</a></h1>
+    
+    <noscript>
+        <div id="noscriptModal" style="display: flex; justify-content: center; align-items: center; position: fixed; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(110, 178, 233); z-index: 1000; box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);">
+            <div style="background-color: rgba(110, 178, 233); padding: 20px; border-radius: 5px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);">
+                <p style="text-align: center;">检测到JavaScript被禁用，您无法使用网盘。</p>
+                <p style="text-align: center;">请不要自作聪明，如果想继续使用此网盘，请启用JavaScript并刷新网页。</p>
+            </div>
+        </div>
+    </noscript>
+    
+    <script>
+        function calculateTimeDifference() {
+            const targetDate = new Date('2024-10-21T10:34:16');
+            const currentDate = new Date();
+            const timeDifference = currentDate - targetDate;
+
+            const years = Math.floor(timeDifference / (365 * 24 * 60 * 60 * 1000));
+            const months = Math.floor((timeDifference % (365 * 24 * 60 * 60 * 1000)) / (30 * 24 * 60 * 60 * 1000));
+            const days = Math.floor((timeDifference % (30 * 24 * 60 * 60 * 1000)) / (24 * 60 * 60 * 1000));
+            const hours = Math.floor((timeDifference % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+            const minutes = Math.floor((timeDifference % (60 * 60 * 1000)) / (60 * 1000));
+            const seconds = Math.floor((timeDifference % (60 * 1000)) / 1000);
+
+            document.getElementById('years').innerText = `${years} 年`;
+            document.getElementById('months').innerText = `${months} 个月`;
+            document.getElementById('days').innerText = `${days} 天`;
+            document.getElementById('hours').innerText = `${hours} 小时`;
+            document.getElementById('minutes').innerText = `${minutes} 分钟`;
+            document.getElementById('seconds').innerText = `${seconds} 秒`;
+        }
+
+        calculateTimeDifference();
+        setInterval(calculateTimeDifference, 1000);
+    </script>
+    <button onclick="logout()" class="lock">锁定网盘</button>
+    <h1 style="font-size:13px;"></h1><a href="https://wj.qq.com/s2/17590422/1e25/" class="lock">反馈</a></h1>
+    <!--
+    ["a3b7c8",
+    "d2e4f5",
+    "g6h9j3",
+    "k5m2n4",
+    "p6q8r7",
+    "t3u5v2",
+    "w9x6y4",
+    "z5a7s3",
+    "f8g2h6",
+    "j4k9m5",
+    "FSYFSY"];
+    -->
+    <h2 style="font-size:20;">MC专区(新)</h2>
+    <p>
+        <a href="minecraft/"class="button-download">立即进入</a>
+    </p>
+    <h2 style="font-size:20;">ShiYouDaHeng.rar - 50.8MB</h2>
+    <p>
+        <a href="https://gh.api.99988866.xyz/https://github.com/FuSiYu666/pan/releases/download/ShiYouDaHeng/ShiYouDaHeng.rar"
+        class="button-download">下载链接1</a>
+        <a href="https://hunshcn.github.io/gh-proxy/FuSiYu666/pan/releases/download/ShiYouDaHeng/ShiYouDaHeng.rar"
+        class="button-download">下载链接2</a>
+        <a href="https://github.moeyy.xyz/FuSiYu666/pan/releases/download/ShiYouDaHeng/ShiYouDaHeng.rar"
+        class="button-download">下载链接3</a>
+        <a href="https://bgithub.xyz/FuSiYu666/pan/releases/download/ShiYouDaHeng/ShiYouDaHeng.rar"
+        class="button-download">下载链接4</a>
+        <a href="https://kkgithub.com/FuSiYu666/pan/releases/download/ShiYouDaHeng/ShiYouDaHeng.rar"
+        class="button-download">下载链接5</a>
+        <a href="https://github.moeyy.xyz/https://github.com/FuSiYu666/pan/releases/download/ShiYouDaHeng/ShiYouDaHeng.rar"
+        class="button-download">下载链接6</a>
+        <a href="https://github.com/FuSiYu666/pan/releases/download/ShiYouDaHeng/ShiYouDaHeng.rar" class="button-download">下载链接7</a>
+    </p>
+    <h2 style="font-size:20;">MiTa-MiSide.rar - 846MB(超大文件)</h2>
+    <p>
+        <a href="https://gh.api.99988866.xyz/https://github.com/FuSiYu666/pan/releases/download/MiTa-MiSlide/MiTa-MiSide.rar"
+        class="button-download">下载链接1</a>
+        <a href="https://hunshcn.github.io/gh-proxy/FuSiYu666/pan/releases/download/MiTa-MiSlide/MiTa-MiSide.rar"
+        class="button-download">下载链接2</a>
+        <a href="https://github.moeyy.xyz/FuSiYu666/pan/releases/download/MiTa-MiSlide/MiTa-MiSide.rar"
+        class="button-download">下载链接3</a>
+        <a href="https://bgithub.xyz/FuSiYu666/pan/releases/download/MiTa-MiSlide/MiTa-MiSide.rar"
+        class="button-download">下载链接4</a>
+        <a href="https://kkgithub.com/FuSiYu666/pan/releases/download/MiTa-MiSlide/MiTa-MiSide.rar"
+        class="button-download">下载链接5</a>
+        <a href="https://github.moeyy.xyz/https://github.com/FuSiYu666/pan/releases/download/MiTa-MiSlide/MiTa-MiSide.rar"
+        class="button-download">下载链接6</a>
+        <a href="https://github.com/FuSiYu666/pan/releases/download/MiTa-MiSlide/MiTa-MiSide.rar" class="button-download">下载链接7</a>
+    </p>
+    <h2 style="font-size:20;">JiPinFeiChe7.7z - 862MB(超大文件)</h2>
+    <p>
+        <a href="https://gh.api.99988866.xyz/https://github.com/FuSiYu666/pan/releases/download/JiPinFeiChe7/JiPinFeiChe7.7z"
+        class="button-download">下载链接1</a>
+        <a href="https://hunshcn.github.io/gh-proxy/FuSiYu666/pan/releases/download/JiPinFeiChe7/JiPinFeiChe7.7z"
+        class="button-download">下载链接2</a>
+        <a href="https://github.moeyy.xyz/FuSiYu666/pan/releases/download/JiPinFeiChe7/JiPinFeiChe7.7z"
+        class="button-download">下载链接3</a>
+        <a href="https://bgithub.xyz/FuSiYu666/pan/releases/download/JiPinFeiChe7/JiPinFeiChe7.7z"
+        class="button-download">下载链接4</a>
+        <a href="https://kkgithub.com/FuSiYu666/pan/releases/download/JiPinFeiChe7/JiPinFeiChe7.7z"
+        class="button-download">下载链接5</a>
+        <a href="https://github.moeyy.xyz/https://github.com/FuSiYu666/pan/releases/download/JiPinFeiChe7/JiPinFeiChe7.7z"
+        class="button-download">下载链接6</a>
+        <a href="https://github.com/FuSiYu666/pan/releases/download/JiPinFeiChe7/JiPinFeiChe7.7z" class="button-download">下载链接7</a>
+    </p>
+    <h2 style="font-size:20;">ZhiWuDaZhanJiangShi.zip - 116MB</h2>
+    <p>
+        <a href="https://gh.api.99988866.xyz/https://github.com/FuSiYu666/pan/releases/download/ZhiWuDaZhanJiangShi/ZhiWuDaZhanJiangShi.zip"
+        class="button-download">下载链接1</a>
+        <a href="https://hunshcn.github.io/gh-proxy/FuSiYu666/pan/releases/download/ZhiWuDaZhanJiangShi/ZhiWuDaZhanJiangShi.zip"
+        class="button-download">下载链接2</a>
+        <a href="https://github.moeyy.xyz/FuSiYu666/pan/releases/download/ZhiWuDaZhanJiangShi/ZhiWuDaZhanJiangShi.zip"
+        class="button-download">下载链接3</a>
+        <a href="https://bgithub.xyz/FuSiYu666/pan/releases/download/ZhiWuDaZhanJiangShi/ZhiWuDaZhanJiangShi.zip"
+        class="button-download">下载链接4</a>
+        <a href="https://kkgithub.com/FuSiYu666/pan/releases/download/ZhiWuDaZhanJiangShi/ZhiWuDaZhanJiangShi.zip"
+        class="button-download">下载链接5</a>
+        <a href="https://github.moeyy.xyz/https://github.com/FuSiYu666/pan/releases/download/ZhiWuDaZhanJiangShi/ZhiWuDaZhanJiangShi.zip"
+        class="button-download">下载链接6</a>
+        <a href="https://github.com/FuSiYu666/pan/releases/download/ZhiWuDaZhanJiangShi/ZhiWuDaZhanJiangShi.zip" class="button-download">下载链接7</a>
+    </p>
+    <h2 style="font-size:20;">BaoWeiLuoBo.exe - 44.7MB</h2>
+    <p>
+        <a href="https://gh.api.99988866.xyz/https://github.com/FuSiYu666/pan/releases/download/BaoWeiLuoBo/BaoWeiLuoBo.exe"
+        class="button-download">下载链接1</a>
+        <a href="https://hunshcn.github.io/gh-proxy/FuSiYu666/pan/releases/download/BaoWeiLuoBo/BaoWeiLuoBo.exe"
+        class="button-download">下载链接2</a>
+        <a href="https://github.moeyy.xyz/FuSiYu666/pan/releases/download/BaoWeiLuoBo/BaoWeiLuoBo.exe"
+        class="button-download">下载链接3</a>
+        <a href="https://bgithub.xyz/FuSiYu666/pan/releases/download/BaoWeiLuoBo/BaoWeiLuoBo.exe"
+        class="button-download">下载链接4</a>
+        <a href="https://kkgithub.com/FuSiYu666/pan/releases/download/BaoWeiLuoBo/BaoWeiLuoBo.exe"
+        class="button-download">下载链接5</a>
+        <a href="https://github.moeyy.xyz/https://github.com/FuSiYu666/pan/releases/download/BaoWeiLuoBo/BaoWeiLuoBo.exe"
+        class="button-download">下载链接6</a>
+        <a href="https://github.com/FuSiYu666/pan/releases/download/BaoWeiLuoBo/BaoWeiLuoBo.exe" class="button-download">下载链接7</a>
+    </p>
+
+    <h2 style="font-size:20;">ZhanDiMoNiQi.zip - 106.78MB</h2>
+    <p>
+        <a href="https://gh.api.99988866.xyz/https://github.com/FuSiYu666/pan/releases/download/ZhanDiMoNiQi/ZhanDiMoNiQi.zip"
+        class="button-download">下载链接1</a>
+        <a href="https://hunshcn.github.io/gh-proxy/FuSiYu666/pan/releases/download/ZhanDiMoNiQi/ZhanDiMoNiQi.zip"
+        class="button-download">下载链接2</a>
+        <a href="https://github.moeyy.xyz/FuSiYu666/pan/releases/download/ZhanDiMoNiQi/ZhanDiMoNiQi.zip"
+        class="button-download">下载链接3</a>
+        <a href="https://bgithub.xyz/FuSiYu666/pan/releases/download/ZhanDiMoNiQi/ZhanDiMoNiQi.zip"
+        class="button-download">下载链接4</a>
+        <a href="https://kkgithub.com/FuSiYu666/pan/releases/download/ZhanDiMoNiQi/ZhanDiMoNiQi.zip"
+        class="button-download">下载链接5</a>
+        <a href="https://github.moeyy.xyz/https://github.com/FuSiYu666/pan/releases/download/ZhanDiMoNiQi/ZhanDiMoNiQi.zip"
+        class="button-download">下载链接6</a>
+        <a href="https://github.com/FuSiYu666/pan/releases/download/ZhanDiMoNiQi/ZhanDiMoNiQi.zip" class="button-download">下载链接7</a>
+    </p>
+
+    <h2 style="font-size:20;">BanJiangYinYue.zip - 17.5MB</h2>
+    <p>
+        <a href="https://gh.api.99988866.xyz/https://github.com/FuSiYu666/pan/releases/download/BanJiangYinYue/BanJiangYinYue.zip"
+        class="button-download">下载链接1</a>
+        <a href="https://hunshcn.github.io/gh-proxy/FuSiYu666/pan/releases/download/BanJiangYinYue/BanJiangYinYue.zip"
+        class="button-download">下载链接2</a>
+        <a href="https://github.moeyy.xyz/FuSiYu666/pan/releases/download/BanJiangYinYue/BanJiangYinYue.zip"
+        class="button-download">下载链接3</a>
+        <a href="https://bgithub.xyz/FuSiYu666/pan/releases/download/BanJiangYinYue/BanJiangYinYue.zip"
+        class="button-download">下载链接4</a>
+        <a href="https://kkgithub.com/FuSiYu666/pan/releases/download/BanJiangYinYue/BanJiangYinYue.zip"
+        class="button-download">下载链接5</a>
+        <a href="https://github.moeyy.xyz/https://github.com/FuSiYu666/pan/releases/download/BanJiangYinYue/BanJiangYinYue.zip"
+        class="button-download">下载链接6</a>
+        <a href="https://github.com/FuSiYu666/pan/releases/download/BanJiangYinYue/BanJiangYinYue.zip"
+        class="button-download">下载链接7</a>
+    </p>
+    <h2 style="font-size:20;">DiskGenius.exe - 20.4MB</h2>
+    <p>
+        <a href="https://gh.api.99988866.xyz/https://github.com/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe"
+        class="button-download">下载链接1</a>
+        <a href="https://hunshcn.github.io/gh-proxy/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe"
+        class="button-download">下载链接2</a>
+        <a href="https://github.moeyy.xyz/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe"
+        class="button-download">下载链接3</a>
+        <a href="https://bgithub.xyz/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe"
+        class="button-download">下载链接4</a>
+        <a href="https://kkgithub.com/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe"
+        class="button-download">下载链接5</a>
+        <a href="https://github.moeyy.xyz/https://github.com/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe"
+        class="button-download">下载链接6</a>
+        <a href="https://github.com/FuSiYu666/pan/releases/download/DiskGenius/DiskGenius.exe"
+        class="button-download">下载链接7</a>
+    </p>
+    <h2 style="font-size:20;">blackmonkey-1.zip - 451MB</h2>
+    <p>
+        <a href="https://gh.api.99988866.xyz/https://github.com/FuSiYu666/pan/releases/download/blackmonkey/blackmonkey-1.zip"
+        class="button-download">下载链接1</a>
+        <a href="https://hunshcn.github.io/gh-proxy/FuSiYu666/pan/releases/download/blackmonkey/blackmonkey-1.zip"
+        class="button-download">下载链接2</a>
+        <a href="https://github.moeyy.xyz/FuSiYu666/pan/releases/download/blackmonkey/blackmonkey-1.zip"
+        class="button-download">下载链接3</a>
+        <a href="https://bgithub.xyz/FuSiYu666/pan/releases/download/blackmonkey/blackmonkey-1.zip"
+        class="button-download">下载链接4</a>
+        <a href="https://kkgithub.com/FuSiYu666/pan/releases/download/blackmonkey/blackmonkey-1.zip"
+        class="button-download">下载链接5</a>
+        <a href="https://github.moeyy.xyz/https://github.com/FuSiYu666/pan/releases/download/blackmonkey/blackmonkey-1.zip"
+        class="button-download">下载链接6</a>
+        <a href="https://github.com/FuSiYu666/pan/releases/download/blackmonkey/blackmonkey-1.zip" class="button-download">下载链接7</a>
+    </p>
+
+    <h2 style="font-size:20;">NET3.5.exe - 2.74MB</h2>
+    <p>
+        <a href="https://gh.api.99988866.xyz/https://github.com/FuSiYu666/pan/releases/download/NET/NET3.5.exe"
+        class="button-download">下载链接1</a>
+        <a href="https://hunshcn.github.io/gh-proxy/FuSiYu666/pan/releases/download/NET/NET3.5.exe"
+        class="button-download">下载链接2</a>
+        <a href="https://github.moeyy.xyz/FuSiYu666/pan/releases/download/NET/NET3.5.exe"
+        class="button-download">下载链接3</a>
+        <a href="https://bgithub.xyz/FuSiYu666/pan/releases/download/NET/NET3.5.exe"
+        class="button-download">下载链接4</a>
+        <a href="https://kkgithub.com/FuSiYu666/pan/releases/download/NET/NET3.5.exe"
+        class="button-download">下载链接5</a>
+        <a href="https://github.moeyy.xyz/https://github.com/FuSiYu666/pan/releases/download/NET/NET3.5.exe"
+        class="button-download">下载链接6</a>
+        <a href="https://github.com/FuSiYu666/pan/releases/download/NET/NET3.5.exe" class="button-download">下载链接7</a>
+    </p>
+
+    <h2 style="font-size:20;">NET4.0.exe - 48.1MB</h2>
+    <p>
+        <a href="https://gh.api.99988866.xyz/https://github.com/FuSiYu666/pan/releases/download/NET/NET4.0.exe"
+        class="button-download">下载链接1</a>
+        <a href="https://hunshcn.github.io/gh-proxy/FuSiYu666/pan/releases/download/NET/NET4.0.exe"
+        class="button-download">下载链接2</a>
+        <a href="https://github.moeyy.xyz/FuSiYu666/pan/releases/download/NET/NET4.0.exe"
+        class="button-download">下载链接3</a>
+        <a href="https://bgithub.xyz/FuSiYu666/pan/releases/download/NET/NET4.0.exe"
+        class="button-download">下载链接4</a>
+        <a href="https://kkgithub.com/FuSiYu666/pan/releases/download/NET/NET4.0.exe"
+        class="button-download">下载链接5</a>
+        <a href="https://github.moeyy.xyz/https://github.com/FuSiYu666/pan/releases/download/NET/NET4.0.exe"
+        class="button-download">下载链接6</a>
+        <a href="https://github.com/FuSiYu666/pan/releases/download/NET/NET4.0.exe" class="button-download">下载链接7</a>
+    </p>
+
+    <h2 style="font-size:20;">Shawarma.Legend.zip - 78.8MB</h2>
+    <p>
+        <a href="https://gh.api.99988866.xyz/https://github.com/FuSiYu666/pan/releases/download/Shawarma.Legend/Shawarma.Legend.zip"
+        class="button-download">下载链接1</a>
+        <a href="https://hunshcn.github.io/gh-proxy/FuSiYu666/pan/releases/download/Shawarma.Legend/Shawarma.Legend.zip"
+        class="button-download">下载链接2</a>
+        <a href="https://github.moeyy.xyz/FuSiYu666/pan/releases/download/Shawarma.Legend/Shawarma.Legend.zip"
+        class="button-download">下载链接3</a>
+        <a href="https://bgithub.xyz/FuSiYu666/pan/releases/download/Shawarma.Legend/Shawarma.Legend.zip"
+        class="button-download">下载链接4</a>
+        <a href="https://kkgithub.com/FuSiYu666/pan/releases/download/Shawarma.Legend/Shawarma.Legend.zip"
+        class="button-download">下载链接5</a>
+        <a href="https://github.moeyy.xyz/https://github.com/FuSiYu666/pan/releases/download/Shawarma.Legend/Shawarma.Legend.zip"
+        class="button-download">下载链接6</a>
+        <a href="https://github.com/FuSiYu666/pan/releases/download/Shawarma.Legend/Shawarma.Legend.zip"
+        class="button-download">下载链接7</a>
+    </p>
+
+    <h2 style="font-size:20;">io-auto-clicker.exe - 430KB</h2>
+    <p>
+        <a href="https://gh.api.99988866.xyz/https://github.com/FuSiYu666/pan/releases/download/io-auto-clicker/io-auto-clicker.exe"
+        class="button-download">下载链接1</a>
+        <a href="https://hunshcn.github.io/gh-proxy/FuSiYu666/pan/releases/download/io-auto-clicker/io-auto-clicker.exe"
+        class="button-download">下载链接2</a>
+        <a href="https://github.moeyy.xyz/FuSiYu666/pan/releases/download/io-auto-clicker/io-auto-clicker.exe"
+        class="button-download">下载链接3</a>
+        <a href="https://bgithub.xyz/FuSiYu666/pan/releases/download/io-auto-clicker/io-auto-clicker.exe"
+        class="button-download">下载链接4</a>
+        <a href="https://kkgithub.com/FuSiYu666/pan/releases/download/io-auto-clicker/io-auto-clicker.exe"
+        class="button-download">下载链接5</a>
+        <a href="https://github.moeyy.xyz/https://github.com/FuSiYu666/pan/releases/download/io-auto-clicker/io-auto-clicker.exe"
+        class="button-download">下载链接6</a>
+        <a href="https://github.com/FuSiYu666/pan/releases/download/io-auto-clicker/io-auto-clicker.exe"
+        class="button-download">下载链接7</a>
+    </p>
+    <a href="https://github.com/FuSiYu666/"><p style="font-size:18px;">本网站作者Github首页</p></a>
+    <a href="https://github.com/FuSiYu666/pan/"><p style="font-size:18px;">上传文件请出门左转-Github(FuSiYu666/pan)</p></a>
+    <a href="https://fcp7.com/github-mirror-daily-updates.html"><p style="font-size:18px;">若所有镜像源都失效，请使用备用镜像源(第三方)</p></a>
+
+    <a href="https://hx.nobook.com/chemical/new?moduleId=9"><p style="font-size:18px;">1</p></a>
+
+    </body>
+</html>
